@@ -8,7 +8,7 @@ export default function RootLayout() {
     const isHome = location.pathname === '/';
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-900 text-slate-100 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen flex flex-col font-sans selection:bg-blue-500/30">
             <NavBar />
             <main className={isHome ? "flex-grow w-full" : "flex-grow w-full max-w-4xl mx-auto px-4 py-8 mt-24"}>
                 <Outlet />

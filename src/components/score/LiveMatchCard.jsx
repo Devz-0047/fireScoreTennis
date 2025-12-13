@@ -15,7 +15,7 @@ export default function LiveMatchCard({ match }) {
     const { player1, player2, sets, currentScore, server, matchId } = match;
 
     return (
-        <div className="bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-700/50 mb-4">
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700/50 mb-4">
             <div className="space-y-4">
                 {/* Player 1 Row */}
                 <PlayerRow
@@ -28,7 +28,7 @@ export default function LiveMatchCard({ match }) {
                 />
 
                 {/* Divider */}
-                <div className="h-px bg-slate-700/50" />
+                <div className="h-px bg-slate-200 dark:bg-slate-700/50" />
 
                 {/* Player 2 Row */}
                 <PlayerRow
@@ -41,7 +41,7 @@ export default function LiveMatchCard({ match }) {
                 />
             </div>
 
-            <div className="mt-3 flex justify-between items-center text-xs text-slate-400 uppercase tracking-widest font-semibold px-2">
+            <div className="mt-3 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold px-2">
                 <span>Round of 16</span>
                 <span className="text-red-400 animate-pulse">● Live</span>
             </div>
@@ -76,18 +76,18 @@ function PlayerRow({ player, isServing, score, sets, matchId, playerId }) {
 
                 <FlagIcon code={player.countryCode} />
                 {profile ? (
-                    <Link to={`/rankings/${profile.id}`} className="font-semibold text-lg text-white tracking-tight hover:text-blue-400 hover:underline decoration-blue-500/50 underline-offset-4 transition-colors">
+                    <Link to={`/rankings/${profile.id}`} className="font-semibold text-lg text-slate-900 dark:text-white tracking-tight hover:text-blue-600 dark:hover:text-blue-400 hover:underline decoration-blue-500/50 underline-offset-4 transition-colors">
                         {player.name}
                     </Link>
                 ) : (
-                    <span className="font-semibold text-lg text-white tracking-tight">{player.name}</span>
+                    <span className="font-semibold text-lg text-slate-900 dark:text-white tracking-tight">{player.name}</span>
                 )}
             </div>
 
             {/* Scores */}
             <div className="flex items-center space-x-6">
                 {/* Set Scores */}
-                <div className="flex space-x-4 text-slate-400 font-mono text-sm">
+                <div className="flex space-x-4 text-slate-500 dark:text-slate-400 font-mono text-sm">
                     {sets.map((s, i) => (
                         <span key={i}>{s}</span>
                     ))}
@@ -101,7 +101,7 @@ function PlayerRow({ player, isServing, score, sets, matchId, playerId }) {
                             initial={{ scale: 1.5, color: '#60a5fa' }}
                             animate={{ scale: 1, color: '#ffffff' }}
                             transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                            className="inline-block font-bold text-xl text-yellow-400 font-mono"
+                            className="inline-block font-bold text-xl text-yellow-600 dark:text-yellow-400 font-mono"
                         >
                             {score}
                         </motion.span>

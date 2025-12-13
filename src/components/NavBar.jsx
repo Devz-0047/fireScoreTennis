@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const tabs = [
     { path: '/', label: 'Home', exact: true },
@@ -13,6 +14,7 @@ const tabs = [
 
 export default function NavBar() {
     const location = useLocation();
+    const { theme, toggleTheme } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
     const activePath = location.pathname;
     const isHome = activePath === '/';
@@ -20,7 +22,7 @@ export default function NavBar() {
     return (
         <nav className={clsx(
             "fixed top-0 left-0 right-0 z-50 transition-colors duration-300",
-            isHome && !isOpen ? "bg-transparent border-transparent" : "bg-slate-950 border-b border-slate-800 shadow-lg"
+            isHome && !isOpen ? "bg-transparent border-transparent" : "bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-lg dark:shadow-none"
         )}>
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex items-center justify-between h-20 md:h-24">
@@ -41,8 +43,8 @@ export default function NavBar() {
                                     <Link
                                         to={tab.path}
                                         className={clsx(
-                                            "block py-2 font-bold transition-colors hover:text-blue-300 focus:outline-none",
-                                            isActive ? "text-white" : "text-slate-400"
+                                            "block py-2 font-bold transition-colors hover:text-blue-600 dark:hover:text-blue-300 focus:outline-none",
+                                            isActive ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
                                         )}
                                     >
                                         {tab.label}
@@ -59,13 +61,31 @@ export default function NavBar() {
                         })}
                     </ul>
 
-                    {/* Mobile Hamburger */}
+                    {/* Desktop Theme Toggle */}
                     <button
-                        className="md:hidden text-white z-50 relative focus:outline-none"
-                        onClick={() => setIsOpen(!isOpen)}
+                        onClick={toggleTheme}
+                        className="hidden md:block p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-900 dark:text-white"
+                        aria-label="Toggle Theme"
                     >
-                        {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+                        {theme === 'dark' ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
                     </button>
+
+                    {/* Mobile Controls */}
+                    <div className="flex items-center gap-4 md:hidden z-50 relative">
+                        <button
+                            onClick={toggleTheme}
+                            className="text-slate-900 dark:text-white focus:outline-none"
+                        >
+                            {theme === 'dark' ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
+                        </button>
+
+                        <button
+                            className="text-slate-900 dark:text-white focus:outline-none"
+                            onClick={() => setIsOpen(!isOpen)}
+                        >
+                            {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -76,7 +96,7 @@ export default function NavBar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden bg-slate-950 border-b border-slate-800 overflow-hidden"
+                        className="md:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 overflow-hidden"
                     >
                         <ul className="px-6 pb-8 pt-2 space-y-4">
                             {tabs.map((tab) => {
@@ -96,7 +116,7 @@ export default function NavBar() {
                                             onClick={() => setIsOpen(false)}
                                             className={clsx(
                                                 "block text-2xl font-bold transition-colors",
-                                                isActive ? "text-blue-400" : "text-slate-400 hover:text-white"
+                                                isActive ? "text-blue-500 dark:text-blue-400" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                                             )}
                                         >
                                             {tab.label}

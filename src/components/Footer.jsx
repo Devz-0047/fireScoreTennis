@@ -3,7 +3,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Github, Mail } from 'lucide-rea
 
 export default function Footer() {
     return (
-        <footer className="bg-slate-950 text-slate-400 border-t border-slate-800">
+        <footer className="bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-6 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Brand Section */}
@@ -23,7 +23,7 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Quick Links</h3>
+                        <h3 className="text-slate-900 dark:text-white font-bold mb-4 uppercase tracking-wider text-sm">Quick Links</h3>
                         <ul className="space-y-2">
                             <FooterLink to="/" label="Home" />
                             <FooterLink to="/score" label="Live Scores" />
@@ -34,7 +34,7 @@ export default function Footer() {
 
                     {/* Resources */}
                     <div>
-                        <h3 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Resources</h3>
+                        <h3 className="text-slate-900 dark:text-white font-bold mb-4 uppercase tracking-wider text-sm">Resources</h3>
                         <ul className="space-y-2">
                             <FooterLink to="#" label="API Documentation" />
                             <FooterLink to="#" label="Terms of Service" />
@@ -45,13 +45,13 @@ export default function Footer() {
 
                     {/* Newsletter */}
                     <div>
-                        <h3 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Stay Updated</h3>
+                        <h3 className="text-slate-900 dark:text-white font-bold mb-4 uppercase tracking-wider text-sm">Stay Updated</h3>
                         <p className="text-sm mb-4">Subscribe to our newsletter for the latest tennis insights.</p>
                         <form className="flex flex-col space-y-2">
                             <input
                                 type="email"
                                 placeholder="Enter your email"
-                                className="bg-slate-900 border border-slate-800 rounded px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                                className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
                             />
                             <button
                                 type="button"
@@ -63,7 +63,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm">
+                <div className="border-t border-slate-200 dark:border-slate-800 mt-12 pt-8 text-center text-sm">
                     <p>&copy; {new Date().getFullYear()} FireScore Tennis. All rights reserved.</p>
                 </div>
             </div>
@@ -75,7 +75,7 @@ function SocialLink({ href, icon }) {
     return (
         <a
             href={href}
-            className="text-slate-400 hover:text-white transition-colors hover:scale-110 transform duration-200"
+            className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors hover:scale-110 transform duration-200"
         >
             {icon}
         </a>
@@ -85,7 +85,7 @@ function SocialLink({ href, icon }) {
 function FooterLink({ to, label }) {
     return (
         <li>
-            <Link to={to} className="hover:text-blue-400 transition-colors text-sm block">
+            <Link to={to} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm block">
                 {label}
             </Link>
         </li>

@@ -2,6 +2,14 @@
 
 @layer base {
   body {
-    @apply bg-slate-900 text-white antialiased;
+    @apply antialiased transition-colors duration-300;
+  }
+
+  :root.light body {
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  :root.dark body {
+    @apply bg-slate-900 text-white;
   }
 }

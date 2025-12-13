@@ -43,7 +43,7 @@ export default function RankingsTable({ players }) {
 
     const HeaderCell = ({ label, sortKey }) => (
         <th
-            className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+            className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-900 dark:hover:text-white transition-colors"
             onClick={() => handleSort(sortKey)}
         >
             <div className="flex items-center space-x-1">
@@ -54,20 +54,20 @@ export default function RankingsTable({ players }) {
     );
 
     return (
-        <div className="bg-slate-800 rounded-xl shadow-lg border border-slate-700/50 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 overflow-hidden">
             <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-700/50">
-                    <thead className="bg-slate-900/50">
+                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <thead className="bg-slate-50 dark:bg-slate-900/50">
                         <tr>
                             <HeaderCell label="Rank" sortKey="rank" />
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Player</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Player</th>
                             <HeaderCell label="MW" sortKey="mw" />
                             <HeaderCell label="SW" sortKey="sw" />
                             <HeaderCell label="GD" sortKey="gd" />
                         </tr>
                     </thead>
                     <motion.tbody
-                        className="divide-y divide-slate-700/50 bg-slate-800"
+                        className="divide-y divide-slate-200 dark:divide-slate-700/50 bg-white dark:bg-slate-800"
                         variants={container}
                         initial="hidden"
                         animate="show"
@@ -77,20 +77,20 @@ export default function RankingsTable({ players }) {
                                 key={player.id}
                                 variants={item}
                                 onClick={() => navigate(`/rankings/${player.id}`)}
-                                className="hover:bg-slate-700/50 cursor-pointer transition-colors group"
-                                whileHover={{ scale: 1.01, backgroundColor: "rgba(51, 65, 85, 0.8)" }}
+                                className="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group"
+                                whileHover={{ scale: 1.01 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             >
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-mono">#{player.rank}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">#{player.rank}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <FlagIcon code={player.countryCode} className="mr-3 w-5 h-3.5" />
-                                        <span className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">{player.name}</span>
+                                        <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">{player.name}</span>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">{player.mw}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">{player.sw}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300 font-mono">{player.gd > 0 ? '+' : ''}{player.gd}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{player.mw}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{player.sw}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 font-mono">{player.gd > 0 ? '+' : ''}{player.gd}</td>
                             </motion.tr>
                         ))}
                     </motion.tbody>
