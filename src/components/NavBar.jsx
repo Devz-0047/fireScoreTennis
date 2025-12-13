@@ -20,15 +20,23 @@ export default function NavBar() {
     const isHome = activePath === '/';
 
     return (
-        <nav className={clsx(
-            "fixed top-0 left-0 right-0 z-50 transition-colors duration-300",
-            isHome && !isOpen ? "bg-transparent border-transparent" : "bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-lg dark:shadow-none"
-        )}>
+        <nav
+  className={clsx(
+    "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+    "backdrop-blur-xl backdrop-saturate-150",
+    isHome && !isOpen
+      ? "bg-white/10 dark:bg-slate-900/20 border-b border-white/20 dark:border-white/10"
+      : "bg-white/70 dark:bg-slate-950/70 border-b border-slate-200/50 dark:border-slate-800/50 shadow-lg"
+  )}
+>
+
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex items-center justify-between h-20 md:h-24">
                     {/* Logo */}
                     <div className="flex-shrink-0 font-bold text-3xl md:text-4xl tracking-tight text-blue-400 z-50 relative">
+                        <Link to="/">
                         FireScore
+                        </Link>
                     </div>
 
                     {/* Desktop Menu */}

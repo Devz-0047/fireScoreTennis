@@ -55,7 +55,7 @@ export default function RankingsTable({ players }) {
 
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-hidden">
                 <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700/50">
                     <thead className="bg-slate-50 dark:bg-slate-900/50">
                         <tr>

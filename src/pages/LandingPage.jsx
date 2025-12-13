@@ -7,7 +7,7 @@ export default function LandingPage() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col pb-20">
 
             {/* Hero Section */}
             <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -32,7 +32,7 @@ export default function LandingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }}
                     >
-                        <span className="inline-block px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-300 text-sm md:text-base font-medium tracking-widest uppercase mb-6 backdrop-blur-md shadow-lg mt-4">
+                        <span className="inline-block px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-300 text-sm md:text-base font-medium tracking-widest uppercase mb-6 backdrop-blur-md shadow-lg mt-4 lg:mt-36">
                             Live Tennis Intelligence
                         </span>
                         <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-6 drop-shadow-2xl">
@@ -62,8 +62,8 @@ export default function LandingPage() {
                             onClick={() => navigate('/score')}
                             className="group relative px-10 py-5 bg-slate-900 text-white dark:bg-white dark:text-slate-950 rounded-full font-bold text-xl hover:bg-blue-600 dark:hover:bg-blue-50 transition-all transform hover:scale-105 shadow-xl dark:shadow-[0_0_50px_-10px_rgba(255,255,255,0.4)]"
                         >
-                            <span className="flex items-center">
-                                Live Scores <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                            <span className="flex items-center mt-[-20]">
+                                Live Scores <ArrowRight className="mt-[-8] ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
                             </span>
                         </button>
                     </motion.div>
