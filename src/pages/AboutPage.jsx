@@ -25,7 +25,7 @@ export default function AboutPage() {
             {/* Header */}
             <motion.div variants={item} className="text-center space-y-4">
                 <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">
-                    AceTrack
+                    FireScore
                 </h1>
                 <p className="text-xl text-slate-400 max-w-2xl mx-auto">
                     The next generation tennis scoreboard experience.
@@ -40,7 +40,7 @@ export default function AboutPage() {
                     </div>
                     <h2 className="text-2xl font-bold text-white mb-4">Purpose</h2>
                     <p className="text-slate-400 leading-relaxed">
-                        AceTrack provides a real-time, immersive way to follow tennis matches.
+                        FireScore provides a real-time, immersive way to follow tennis matches.
                         Designed to replace clunky, legacy scoreboards with a modern, animated interface that brings the energy of the court to your screen.
                     </p>
                 </motion.div>

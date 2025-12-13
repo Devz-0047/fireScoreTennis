@@ -23,7 +23,7 @@ export default function ScorePage() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={clsx(
-                                "relative px-6 py-2 rounded-md text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-blue-500/50",
+                                "relative cursor-pointer px-6 py-2 rounded-md text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-blue-500/50",
                                 activeTab === tab.id ? "text-white" : "text-slate-400 hover:text-slate-200"
                             )}
                         >
