@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy } from 'lucide-react'; // Fallback icon
 import FlagIcon from '../ui/FlagIcon';
+import { Link } from 'react-router-dom';
+import { rankings } from '../../data/rankings';
 
 // Tennis Ball Icon Component
 const TennisBall = () => (
@@ -15,7 +17,10 @@ export default function LiveMatchCard({ match }) {
     const { player1, player2, sets, currentScore, server, matchId } = match;
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700/50 mb-4">
+        <Link
+            to={`/score/${matchId}`}
+            className="block bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg border border-slate-200 dark:border-slate-700/50 mb-4 hover:border-blue-400 dark:hover:border-blue-500 transition-colors group relative"
+        >
             <div className="space-y-4">
                 {/* Player 1 Row */}
                 <PlayerRow
@@ -45,14 +50,9 @@ export default function LiveMatchCard({ match }) {
                 <span>Round of 16</span>
                 <span className="text-red-400 animate-pulse">● Live</span>
             </div>
-        </div>
+        </Link>
     );
 }
-
-import { Link } from 'react-router-dom';
-import { rankings } from '../../data/rankings';
-
-// ... (code)
 
 function PlayerRow({ player, isServing, score, sets, matchId, playerId }) {
     // Find player ID from rankings
@@ -76,9 +76,11 @@ function PlayerRow({ player, isServing, score, sets, matchId, playerId }) {
 
                 <FlagIcon code={player.countryCode} />
                 {profile ? (
-                    <Link to={`/rankings/${profile.id}`} className="font-semibold text-lg text-slate-900 dark:text-white tracking-tight hover:text-blue-600 dark:hover:text-blue-400 hover:underline decoration-blue-500/50 underline-offset-4 transition-colors">
-                        {player.name}
-                    </Link>
+                    <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
+                        <Link to={`/rankings/${profile.id}`} className="font-semibold text-lg text-slate-900 dark:text-white tracking-tight hover:text-blue-600 dark:hover:text-blue-400 hover:underline decoration-blue-500/50 underline-offset-4 transition-colors">
+                            {player.name}
+                        </Link>
+                    </div>
                 ) : (
                     <span className="font-semibold text-lg text-slate-900 dark:text-white tracking-tight">{player.name}</span>
                 )}

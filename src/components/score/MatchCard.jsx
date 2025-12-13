@@ -5,23 +5,28 @@ import { rankings } from '../../data/rankings';
 
 export default function MatchCard({ match }) {
     const isUpcoming = match.status === 'UPCOMING';
-    const { player1, player2, sets } = match;
+    const { player1, player2, sets, matchId } = match;
 
     // Find profiles
     const p1Profile = rankings.find(r => r.name === player1.name);
     const p2Profile = rankings.find(r => r.name === player2.name);
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700/50 mb-4 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+        <Link
+            to={`/score/${matchId}`}
+            className="block bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700/50 mb-4 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all duration-200 group relative"
+        >
             <div className="space-y-3">
                 {/* Player 1 */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <FlagIcon code={player1.countryCode} />
                         {p1Profile ? (
-                            <Link to={`/rankings/${p1Profile.id}`} className={clsx("font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors", match.winner === 'p1' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
-                                {player1.name}
-                            </Link>
+                            <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
+                                <Link to={`/rankings/${p1Profile.id}`} className={clsx(match.winner === 'p1' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
+                                    {player1.name}
+                                </Link>
+                            </div>
                         ) : (
                             <span className={clsx("font-medium", match.winner === 'p1' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
                                 {player1.name}
@@ -40,9 +45,11 @@ export default function MatchCard({ match }) {
                     <div className="flex items-center space-x-3">
                         <FlagIcon code={player2.countryCode} />
                         {p2Profile ? (
-                            <Link to={`/rankings/${p2Profile.id}`} className={clsx("font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors", match.winner === 'p2' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
-                                {player2.name}
-                            </Link>
+                            <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
+                                <Link to={`/rankings/${p2Profile.id}`} className={clsx(match.winner === 'p2' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
+                                    {player2.name}
+                                </Link>
+                            </div>
                         ) : (
                             <span className={clsx("font-medium", match.winner === 'p2' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
                                 {player2.name}
@@ -69,6 +76,6 @@ export default function MatchCard({ match }) {
                     <span className="uppercase tracking-widest font-semibold text-slate-500">Finished</span>
                 </div>
             )}
-        </div>
+        </Link>
     );
 }
