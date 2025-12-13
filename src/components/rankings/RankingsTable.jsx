@@ -85,6 +85,10 @@ export default function RankingsTable() {
         );
     }
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     const sortedPlayers = [...players].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
             return sortConfig.direction === 'asc' ? -1 : 1;
@@ -109,7 +113,14 @@ export default function RankingsTable() {
         }
 
         setSortConfig({ key, direction });
+        setCurrentPage(1); // Reset to first page on sort
     };
+
+    // Calculate Pagination Slices
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = sortedPlayers.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(players.length / itemsPerPage);
 
     const HeaderCell = ({ label, sortKey }) => {
         const isActive = sortConfig.key === sortKey;
@@ -130,48 +141,74 @@ export default function RankingsTable() {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 overflow-hidden">
-            <div className="overflow-x-hidden">
-                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700/50">
-                    <thead className="bg-slate-50 dark:bg-slate-900/50">
-                        <tr>
-                            <HeaderCell label="Rank" sortKey="ranking" />
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Player</th>
-                            <HeaderCell label="Wins" sortKey="wins" />
-                            <HeaderCell label="Losses" sortKey="losses" />
-                            <HeaderCell label="Slams" sortKey="grandSlams" />
-                        </tr>
-                    </thead>
-                    <motion.tbody
-                        className="divide-y divide-slate-200 dark:divide-slate-700/50 bg-white dark:bg-slate-800"
-                        variants={container}
-                        initial="hidden"
-                        animate="show"
-                    >
-                        {sortedPlayers.map((player) => (
-                            <motion.tr
-                                key={player._id}
-                                variants={item}
-                                onClick={() => navigate(`/rankings/${player._id}`)}
-                                className="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group"
-                                whileHover={{ scale: 1.01 }}
-                                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                            >
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">#{player.ranking}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        <FlagIcon code={getCountryCode(player.counrty_code)} className="mr-3 w-5 h-3.5" />
-                                        <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">{player.name}</span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{player.wins}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{player.losses}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 font-mono">{player.grandSlams}</td>
-                            </motion.tr>
-                        ))}
-                    </motion.tbody>
-                </table>
+        <div className="space-y-4">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 overflow-hidden">
+                <div className="overflow-x-hidden">
+                    <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700/50">
+                        <thead className="bg-slate-50 dark:bg-slate-900/50">
+                            <tr>
+                                <HeaderCell label="Rank" sortKey="ranking" />
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Player</th>
+                                <HeaderCell label="Wins" sortKey="wins" />
+                                <HeaderCell label="Losses" sortKey="losses" />
+                                <HeaderCell label="Slams" sortKey="grandSlams" />
+                            </tr>
+                        </thead>
+                        <motion.tbody
+                            className="divide-y divide-slate-200 dark:divide-slate-700/50 bg-white dark:bg-slate-800"
+                            variants={container}
+                            initial="hidden"
+                            animate="show"
+                            key={currentPage} // Animate on page change
+                        >
+                            {currentItems.map((player) => (
+                                <motion.tr
+                                    key={player._id}
+                                    variants={item}
+                                    onClick={() => navigate(`/rankings/${player._id}`)}
+                                    className="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group"
+                                    whileHover={{ scale: 1.01 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                                >
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono">#{player.ranking}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center">
+                                            <FlagIcon code={getCountryCode(player.counrty_code)} className="mr-3 w-5 h-3.5" />
+                                            <span className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">{player.name}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{player.wins}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{player.losses}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 font-mono">{player.grandSlams}</td>
+                                </motion.tr>
+                            ))}
+                        </motion.tbody>
+                    </table>
+                </div>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-between items-center px-2">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                        Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span>
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

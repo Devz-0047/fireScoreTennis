@@ -8,3 +8,8 @@ export const fetchPlayers = async () => {
     const response = await api.get('/api/players/');
     return response.data;
 };
+
+export const fetchPlayer = async (id) => {
+    const response = await api.get(`/api/players/${id}`);
+    return response.data;
+};
