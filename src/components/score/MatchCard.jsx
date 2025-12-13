@@ -1,15 +1,18 @@
 import FlagIcon from '../ui/FlagIcon';
 import { clsx } from 'clsx';
 import { Link } from 'react-router-dom';
-import { rankings } from '../../data/rankings';
+import { getCountryCode } from '../../utils/countryMapper';
 
 export default function MatchCard({ match }) {
-    const isUpcoming = match.status === 'UPCOMING';
-    const { player1, player2, sets, matchId } = match;
+    const isUpcoming = match.status === 'scheduled' || match.status === 'upcoming';
+    const isLive = match.status === 'live';
+    const isFinished = match.status === 'completed' || match.status === 'finished' || (!isUpcoming && !isLive);
 
-    // Find profiles
-    const p1Profile = rankings.find(r => r.name === player1.name);
-    const p2Profile = rankings.find(r => r.name === player2.name);
+    const { playerA, playerB, _id: matchId } = match;
+
+    // Use API-provided IDs directly
+    const p1Id = playerA?._id;
+    const p2Id = playerB?._id;
 
     return (
         <Link
@@ -20,59 +23,63 @@ export default function MatchCard({ match }) {
                 {/* Player 1 */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <FlagIcon code={player1.countryCode} />
-                        {p1Profile ? (
+                        <FlagIcon code={getCountryCode(playerA?.counrty_code)} />
+                        {p1Id ? (
                             <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
-                                <Link to={`/rankings/${p1Profile.id}`} className={clsx(match.winner === 'p1' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
-                                    {player1.name}
+                                <Link to={`/rankings/${p1Id}`} className="text-slate-900 dark:text-white font-bold">
+                                    {playerA?.name}
                                 </Link>
                             </div>
                         ) : (
-                            <span className={clsx("font-medium", match.winner === 'p1' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
-                                {player1.name}
+                            <span className="font-medium text-slate-900 dark:text-white font-bold">
+                                {playerA?.name}
                             </span>
                         )}
                     </div>
-                    {!isUpcoming && (
-                        <div className="flex space-x-4 font-mono text-slate-500 dark:text-slate-400">
-                            {sets.map((s, i) => <span key={i} className={clsx(s.p1 > s.p2 && "text-slate-900 dark:text-white font-bold")}>{s.p1}</span>)}
-                        </div>
-                    )}
                 </div>
 
                 {/* Player 2 */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <FlagIcon code={player2.countryCode} />
-                        {p2Profile ? (
+                        <FlagIcon code={getCountryCode(playerB?.counrty_code)} />
+                        {p2Id ? (
                             <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
-                                <Link to={`/rankings/${p2Profile.id}`} className={clsx(match.winner === 'p2' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
-                                    {player2.name}
+                                <Link to={`/rankings/${p2Id}`} className="text-slate-900 dark:text-white font-bold">
+                                    {playerB?.name}
                                 </Link>
                             </div>
                         ) : (
-                            <span className={clsx("font-medium", match.winner === 'p2' ? "text-slate-900 dark:text-white font-bold" : "text-slate-600 dark:text-slate-300")}>
-                                {player2.name}
+                            <span className="font-medium text-slate-900 dark:text-white font-bold">
+                                {playerB?.name}
                             </span>
                         )}
                     </div>
-                    {!isUpcoming && (
-                        <div className="flex space-x-4 font-mono text-slate-500 dark:text-slate-400">
-                            {sets.map((s, i) => <span key={i} className={clsx(s.p2 > s.p1 && "text-slate-900 dark:text-white font-bold")}>{s.p2}</span>)}
-                        </div>
-                    )}
                 </div>
             </div>
 
             {isUpcoming && (
                 <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 md:flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
-                    <span>{new Date(match.startTime).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                    <span>{match.matchInfo?.tournament} - {match.matchInfo?.round}</span>
                     <span className="uppercase tracking-widest font-semibold text-blue-400">Upcoming</span>
                 </div>
             )}
-            {!isUpcoming && (
+
+            {isLive && (
                 <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 md:flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
-                    <span>Final</span>
+                    <span>{match.matchInfo?.tournament} - {match.matchInfo?.round}</span>
+                    <div className="flex items-center space-x-2">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        </span>
+                        <span className="uppercase tracking-widest font-semibold text-red-500">Live</span>
+                    </div>
+                </div>
+            )}
+
+            {isFinished && (
+                <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 md:flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
+                    <span>{match.matchInfo?.tournament} - {match.matchInfo?.round}</span>
                     <span className="uppercase tracking-widest font-semibold text-slate-500">Finished</span>
                 </div>
             )}

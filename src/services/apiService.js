@@ -13,3 +13,8 @@ export const fetchPlayer = async (id) => {
     const response = await api.get(`/api/players/${id}`);
     return response.data;
 };
+
+export const fetchMatches = async () => {
+    const response = await api.get('/api/matches');
+    return response.data;
+};

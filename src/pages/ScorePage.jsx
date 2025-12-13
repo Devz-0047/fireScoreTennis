@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { matches } from '../data/matches';
+import { useQuery } from '@tanstack/react-query';
 import MatchList from '../components/score/MatchList';
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
+import { fetchMatches } from '../services/apiService';
 
 const tabs = [
     { id: 'LIVE', label: 'Live' },
@@ -12,6 +13,27 @@ const tabs = [
 
 export default function ScorePage() {
     const [activeTab, setActiveTab] = useState('LIVE');
+
+    const { data: matches, isLoading, isError, error } = useQuery({
+        queryKey: ['matches'],
+        queryFn: fetchMatches,
+    });
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="text-slate-500 dark:text-slate-400 animate-pulse">Loading matches...</div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="flex justify-center items-center h-64 text-red-500">
+                Error loading matches: {error.message}
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -32,7 +54,7 @@ export default function ScorePage() {
                             {activeTab === tab.id && (
                                 <motion.div
                                     layoutId="score-tab-bg"
-                                    className="absolute inset-0 bg-slate-white dark:bg-slate-700 rounded-md shadow-sm"
+                                    className="absolute inset-0 bg-white dark:bg-slate-700 rounded-md shadow-sm"
                                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                 />
                             )}
@@ -44,7 +66,15 @@ export default function ScorePage() {
                                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                                 )}
                             >
-                                {tab.label}
+                                <div className="flex items-center space-x-2">
+                                    {tab.id === 'LIVE' && (
+                                        <span className="relative flex h-2.5 w-2.5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                        </span>
+                                    )}
+                                    <span>{tab.label}</span>
+                                </div>
                             </span>
 
                         </button>
@@ -53,7 +83,7 @@ export default function ScorePage() {
             </div>
 
             {/* Content */}
-            <MatchList key={activeTab} matches={matches} filter={activeTab} />
+            <MatchList key={activeTab} matches={matches || []} filter={activeTab} />
         </div>
     );
 }

@@ -19,13 +19,22 @@ const item = {
 
 export default function MatchList({ matches, filter }) {
     const filteredMatches = matches.filter(m => {
-        if (filter === 'ALL') return true;
-        return m.status === filter;
+        if (!filter || filter === 'ALL') return true;
+
+        // Map UI tabs to API status
+        const statusMap = {
+            'LIVE': 'live',
+            'FINISHED': 'completed',
+            'UPCOMING': 'upcoming'
+        };
+
+        const targetStatus = statusMap[filter] || filter;
+        return m.status === targetStatus;
     });
 
     if (filteredMatches.length === 0) {
         return (
-            <div className="text-center py-10 text-slate-500 italic">
+            <div className="text-center py-10 text-slate-500 italic text-xl">
                 No matches found for this category.
             </div>
         )
