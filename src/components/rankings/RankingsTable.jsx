@@ -25,6 +25,8 @@ const item = {
 export default function RankingsTable() {
     const navigate = useNavigate();
     const [sortConfig, setSortConfig] = useState({ key: 'ranking', direction: 'asc' });
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const { data: players, isLoading, isError, error } = useQuery({
         queryKey: ['players', 'rankings'],
@@ -84,10 +86,6 @@ export default function RankingsTable() {
             </div>
         );
     }
-
-    // Pagination State
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
 
     const sortedPlayers = [...players].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {

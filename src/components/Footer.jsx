@@ -17,7 +17,7 @@ export default function Footer() {
                             <SocialLink href="#" icon={<Twitter size={20} />} />
                             <SocialLink href="#" icon={<Facebook size={20} />} />
                             <SocialLink href="#" icon={<Instagram size={20} />} />
-                            <SocialLink href="#" icon={<Github size={20} />} />
+                            <SocialLink href="https://github.com/Devz-0047/fireScoreTennis" icon={<Github size={20} />} />
                         </div>
                     </div>
 
