@@ -8,6 +8,7 @@ import { clsx } from 'clsx';
 import { useTheme } from '../context/ThemeContext';
 import { getCountryCode } from '../utils/countryMapper';
 import MatchDetailsSkeleton from '../components/skeletons/MatchDetailsSkeleton';
+import LiveMatchDetails from '../components/score/LiveMatchDetails';
 
 export default function MatchDetailsPage() {
     const { matchId } = useParams();
@@ -39,7 +40,11 @@ export default function MatchDetailsPage() {
     }
 
     const { playerA, playerB, statistics, matchInfo, status } = match;
-    const isLive = status === 'live';
+    const isLive = status === 'live' || status === 'LIVE';
+
+    if (isLive) {
+        return <LiveMatchDetails match={match} />;
+    }
 
     // Map API stats to component format
     // Handle cases where stats might be incomplete or zero
@@ -122,7 +127,7 @@ export default function MatchDetailsPage() {
                         </div>
 
                         {/* Player 2 */}
-                        <PlayerDisplay player={playerB} isWinner={false} isServer={false} alignRight />
+                        <PlayerDisplay player={playerB} isWinner={false} isServer={false} />
                     </div>
                 </div>
             </div>
