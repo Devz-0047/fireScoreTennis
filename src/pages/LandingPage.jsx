@@ -7,7 +7,7 @@ export default function LandingPage() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen flex flex-col pb-20">
+        <div className="min-h-screen flex flex-col">
 
             {/* Hero Section */}
             <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">

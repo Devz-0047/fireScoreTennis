@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { useTheme } from '../context/ThemeContext';
 import { getCountryCode } from '../utils/countryMapper';
+import MatchDetailsSkeleton from '../components/skeletons/MatchDetailsSkeleton';
 
 export default function MatchDetailsPage() {
     const { matchId } = useParams();
@@ -19,11 +20,7 @@ export default function MatchDetailsPage() {
     });
 
     if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <div className="animate-pulse text-blue-500">Loading match details...</div>
-            </div>
-        );
+        return <MatchDetailsSkeleton />;
     }
 
     if (isError || !match) {

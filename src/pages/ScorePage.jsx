@@ -11,6 +11,8 @@ const tabs = [
     { id: 'UPCOMING', label: 'Upcoming' },
 ];
 
+import MatchCardSkeleton from '../components/skeletons/MatchCardSkeleton';
+
 export default function ScorePage() {
     const [activeTab, setActiveTab] = useState('LIVE');
 
@@ -18,14 +20,6 @@ export default function ScorePage() {
         queryKey: ['matches'],
         queryFn: fetchMatches,
     });
-
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="text-slate-500 dark:text-slate-400 animate-pulse">Loading matches...</div>
-            </div>
-        );
-    }
 
     if (isError) {
         return (
@@ -83,7 +77,15 @@ export default function ScorePage() {
             </div>
 
             {/* Content */}
-            <MatchList key={activeTab} matches={matches || []} filter={activeTab} />
+            {isLoading ? (
+                <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                        <MatchCardSkeleton key={i} />
+                    ))}
+                </div>
+            ) : (
+                <MatchList key={activeTab} matches={matches || []} filter={activeTab} />
+            )}
         </div>
     );
 }
