@@ -1,23 +1,36 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { matches } from '../data/matches';
-import { rankings } from '../data/rankings';
+import { useQuery } from '@tanstack/react-query';
+import { fetchMatch } from '../services/apiService';
 import FlagIcon from '../components/ui/FlagIcon';
-import { ArrowLeft, Clock, MapPin, Trophy, Activity, Zap, Target, Shield, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Trophy, Activity, Zap, Target, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { useTheme } from '../context/ThemeContext';
+import { getCountryCode } from '../utils/countryMapper';
 
 export default function MatchDetailsPage() {
     const { matchId } = useParams();
     const navigate = useNavigate();
     const { theme } = useTheme();
 
-    const match = matches.find(m => m.matchId === matchId);
+    const { data: match, isLoading, isError, error } = useQuery({
+        queryKey: ['match', matchId],
+        queryFn: () => fetchMatch(matchId),
+    });
 
-    if (!match) {
+    if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">Match not found</h2>
+                <div className="animate-pulse text-blue-500">Loading match details...</div>
+            </div>
+        );
+    }
+
+    if (isError || !match) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">Error loading match</h2>
+                <p className="text-slate-500 mb-4">{error?.message || 'Match not found'}</p>
                 <button
                     onClick={() => navigate('/score')}
                     className="text-blue-600 dark:text-blue-400 hover:underline"
@@ -28,18 +41,48 @@ export default function MatchDetailsPage() {
         );
     }
 
-    const { player1, player2, sets, status, currentScore, server } = match;
-    const isLive = status === 'LIVE';
+    const { playerA, playerB, statistics, matchInfo, status } = match;
+    const isLive = status === 'live';
 
-    // Mock detailed stats since they aren't in the data model
-    const stats = {
-        aces: { p1: Math.floor(Math.random() * 15) + 5, p2: Math.floor(Math.random() * 15) + 5 },
-        doubleFaults: { p1: Math.floor(Math.random() * 5), p2: Math.floor(Math.random() * 5) },
-        firstServeIn: { p1: Math.floor(Math.random() * 20) + 55, p2: Math.floor(Math.random() * 20) + 55 }, // Percentage
-        winOnFirstServe: { p1: Math.floor(Math.random() * 20) + 65, p2: Math.floor(Math.random() * 20) + 65 }, // Percentage
-        breakPointsSaved: { p1: Math.floor(Math.random() * 5), p2: Math.floor(Math.random() * 5) },
-        winners: { p1: Math.floor(Math.random() * 30) + 15, p2: Math.floor(Math.random() * 30) + 15 },
-        unforcedErrors: { p1: Math.floor(Math.random() * 25) + 10, p2: Math.floor(Math.random() * 25) + 10 },
+    // Map API stats to component format
+    // Handle cases where stats might be incomplete or zero
+    const stats = statistics || {
+        aces: { playerA: 0, playerB: 0 },
+        doubleFaults: { playerA: 0, playerB: 0 },
+        firstServePercentage: { playerA: 0, playerB: 0 },
+        winOnFirstServe: { playerA: 0, playerB: 0 },
+        breakPointsSaved: { playerA: 0, playerB: 0 },
+        winners: { playerA: 0, playerB: 0 },
+        unforcedErrors: { playerA: 0, playerB: 0 },
+    };
+
+    const isUpcoming = status === 'upcoming' || status === 'scheduled';
+
+    const renderHeaderContent = () => {
+        if (isUpcoming) {
+            return (
+                <div className="text-center">
+                    <div className="text-sm font-bold text-blue-500 dark:text-blue-400 mb-2 uppercase tracking-wide">
+                        Scheduled Start
+                    </div>
+                    <div className="text-3xl font-bold text-slate-800 dark:text-white mb-2 font-mono">
+                        {/* Mocking a time if missing, ideally matches should have startTime */}
+                        {match.startTime ? new Date(match.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "20:00"}
+                    </div>
+                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                        {match.startTime ? new Date(match.startTime).toLocaleDateString() : "Today"}
+                    </div>
+                </div>
+            )
+        }
+        return (
+            <div className="text-center">
+                <div className="text-4xl font-bold text-slate-300 dark:text-slate-600 mb-2">VS</div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                    {matchInfo?.round}
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -51,7 +94,7 @@ export default function MatchDetailsPage() {
             {/* Header / Back Button */}
             <button
                 onClick={() => navigate('/score')}
-                className="flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Scores
@@ -63,80 +106,61 @@ export default function MatchDetailsPage() {
                 <div className="bg-slate-50 dark:bg-slate-900/50 px-6 py-3 flex justify-between items-center text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center space-x-2">
                         <Trophy className="w-4 h-4" />
-                        <span>ATP World Tour Finals</span>
+                        <span>{matchInfo?.tournament || 'Tournament'}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         {isLive && <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />}
                         <span>{status}</span>
-                        {!isLive && match.startTime && <span> • {new Date(match.startTime).toLocaleDateString()}</span>}
                     </div>
                 </div>
 
                 <div className="p-8">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 relative">
                         {/* Player 1 */}
-                        <PlayerDisplay player={player1} isWinner={match.winner === 'p1'} isServer={server === 'p1'} />
+                        <PlayerDisplay player={playerA} isWinner={false} isServer={false} />
 
-                        {/* Vs / Score */}
+                        {/* Vs / Score / Time */}
                         <div className="flex flex-col items-center z-10 w-full md:w-auto">
-                            {!match.startTime ? (
-                                <div className="space-y-4 text-center">
-                                    <div className="flex items-center space-x-1 md:space-x-4">
-                                        {sets.map((set, i) => (
-                                            <div key={i} className="flex flex-col items-center space-y-2">
-                                                <span className="text-2xl md:text-3xl font-bold text-slate-300 dark:text-slate-600">{i + 1}</span>
-                                                <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-2 md:p-3 shadow-inner min-w-[3rem] text-center border border-slate-200 dark:border-slate-800">
-                                                    <div className={clsx("text-lg font-bold mb-1", set.p1 > set.p2 ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400")}>{set.p1}</div>
-                                                    <div className={clsx("text-lg font-bold", set.p2 > set.p1 ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400")}>{set.p2}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {isLive && currentScore && (
-                                            <div className="flex flex-col items-center space-y-2 ml-4">
-                                                <span className="text-2xl md:text-3xl font-bold text-blue-500 dark:text-blue-400 animate-pulse">pts</span>
-                                                <div className="bg-blue-50 dark:bg-slate-900 rounded-lg p-2 md:p-3 shadow-inner min-w-[3rem] text-center border border-blue-200 dark:border-blue-900/30 ring-2 ring-blue-500/20">
-                                                    <div className={clsx("text-lg font-bold mb-1 text-blue-600 dark:text-blue-400")}>{currentScore.p1}</div>
-                                                    <div className={clsx("text-lg font-bold text-blue-600 dark:text-blue-400")}>{currentScore.p2}</div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="text-xs text-slate-400 dark:text-slate-500 font-mono">MATCH DURATION: 2h 14m</div>
-                                </div>
-                            ) : (
-                                <div className="text-center">
-                                    <div className="text-3xl font-bold text-slate-300 dark:text-slate-600 mb-2">VS</div>
-                                    <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                                        {new Date(match.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                </div>
-                            )}
+                            {renderHeaderContent()}
                         </div>
 
                         {/* Player 2 */}
-                        <PlayerDisplay player={player2} isWinner={match.winner === 'p2'} isServer={server === 'p2'} alignRight />
+                        <PlayerDisplay player={playerB} isWinner={false} isServer={false} alignRight />
                     </div>
                 </div>
             </div>
 
-            {/* Statistics Grid */}
+            {/* Statistics / Comparison Grid */}
             <div className="grid md:grid-cols-3 gap-6">
                 {/* Momentum / Key Stats */}
                 <div className="md:col-span-2 space-y-6">
                     <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50">
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center">
                             <Activity className="w-5 h-5 mr-2 text-blue-500" />
-                            Match Statistics
+                            {isUpcoming ? "Head-to-Head Comparison" : "Match Statistics"}
                         </h3>
-                        <div className="space-y-6">
-                            <StatBar label="Aces" p1={stats.aces.p1} p2={stats.aces.p2} icon={<Zap size={14} />} />
-                            <StatBar label="Double Faults" p1={stats.doubleFaults.p1} p2={stats.doubleFaults.p2} reverse />
-                            <StatBar label="1st Serve %" p1={stats.firstServeIn.p1} p2={stats.firstServeIn.p2} suffix="%" />
-                            <StatBar label="Win % on 1st Serve" p1={stats.winOnFirstServe.p1} p2={stats.winOnFirstServe.p2} suffix="%" />
-                            <StatBar label="Winners" p1={stats.winners.p1} p2={stats.winners.p2} icon={<Target size={14} />} />
-                            <StatBar label="Unforced Errors" p1={stats.unforcedErrors.p1} p2={stats.unforcedErrors.p2} reverse />
-                            <StatBar label="Break Points Saved" p1={stats.breakPointsSaved.p1} p2={stats.breakPointsSaved.p2} icon={<Shield size={14} />} />
-                        </div>
+
+                        {isUpcoming ? (
+                            <div className="space-y-6">
+                                <StatBar label="Rank" p1={playerA.ranking} p2={playerB.ranking} reverse />
+                                <StatBar label="Age" p1={playerA.age} p2={playerB.age} />
+                                {/* Parse strings to numbers if needed for comparisons, or just display text */}
+                                <TextStatBar label="Height" p1={playerA.height} p2={playerB.height} />
+                                <TextStatBar label="Weight" p1={playerA.weight} p2={playerB.weight} />
+                                <StatBar label="Career Wins" p1={playerA.wins} p2={playerB.wins} icon={<Trophy size={14} />} />
+                                <StatBar label="Grand Slams" p1={playerA.grandSlams} p2={playerB.grandSlams} icon={<Trophy size={14} />} />
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <StatBar label="Aces" p1={stats.aces.playerA} p2={stats.aces.playerB} icon={<Zap size={14} />} />
+                                <StatBar label="Double Faults" p1={stats.doubleFaults.playerA} p2={stats.doubleFaults.playerB} reverse />
+                                <StatBar label="1st Serve %" p1={stats.firstServePercentage.playerA} p2={stats.firstServePercentage.playerB} suffix="%" />
+                                <StatBar label="Win % on 1st Serve" p1={stats.winOnFirstServe.playerA} p2={stats.winOnFirstServe.playerB} suffix="%" />
+                                <StatBar label="Winners" p1={stats.winners.playerA} p2={stats.winners.playerB} icon={<Target size={14} />} />
+                                <StatBar label="Unforced Errors" p1={stats.unforcedErrors.playerA} p2={stats.unforcedErrors.playerB} reverse />
+                                <StatBar label="Break Points Saved" p1={stats.breakPointsSaved.playerA} p2={stats.breakPointsSaved.playerB} icon={<Shield size={14} />} />
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -145,11 +169,11 @@ export default function MatchDetailsPage() {
                     <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50">
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Match Info</h3>
                         <div className="space-y-4">
-                            <InfoRow label="Tournament" value="World Tour Finals" />
-                            <InfoRow label="Round" value="Semi-Final" />
-                            <InfoRow label="Surface" value="Hard (Indoor)" />
-                            <InfoRow label="Court" value="Center Court" />
-                            <InfoRow label="Umpire" value="Mohamed Lahyani" />
+                            <InfoRow label="Tournament" value={matchInfo?.tournament} />
+                            <InfoRow label="Round" value={matchInfo?.round} />
+                            <InfoRow label="Surface" value={matchInfo?.surface} />
+                            <InfoRow label="Court" value={matchInfo?.court} />
+                            <InfoRow label="Umpire" value={matchInfo?.umpire} />
                         </div>
                     </div>
                 </div>
@@ -159,7 +183,7 @@ export default function MatchDetailsPage() {
 }
 
 function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
-    const profile = rankings.find(r => r.name === player.name);
+    if (!player) return null;
 
     return (
         <div className={clsx("flex flex-col items-center space-y-4 flex-1", alignRight && "md:flex-col-reverse")}>
@@ -169,7 +193,7 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
                     isWinner ? "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)]" : "border-slate-200 dark:border-slate-700"
                 )}>
                     <img
-                        src={profile ? `https://i.pravatar.cc/300?u=${profile.id}` : `https://ui-avatars.com/api/?name=${player.name}&background=random`}
+                        src={`https://i.pravatar.cc/300?u=${player._id}`} // Use API ID for consistent avatars
                         alt={player.name}
                         className="w-full h-full rounded-full object-cover"
                     />
@@ -182,13 +206,13 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
             </div>
             <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">
-                    <FlagIcon code={player.countryCode} className="w-4 h-3" />
-                    <span>{player.countryCode}</span>
+                    <FlagIcon code={getCountryCode(player.counrty_code)} className="w-4 h-3" />
+                    <span>{player.counrty_code}</span> {/* API uses 'counrty_code', mapper handles numbers if needed or we show code */}
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                     {player.name}
                 </h2>
-                {profile && <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Rank #{profile.rank}</div>}
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Rank #{player.ranking}</div>
             </div>
         </div>
     );
@@ -223,6 +247,27 @@ function StatBar({ label, p1, p2, suffix = '', reverse = false, icon }) {
                 <div
                     className={clsx("h-full flex-1 transition-all duration-1000", p2Better ? "bg-blue-500" : "bg-slate-400 dark:bg-slate-600")}
                 />
+            </div>
+        </div>
+    );
+}
+
+function TextStatBar({ label, p1, p2 }) {
+    return (
+        <div className="space-y-2">
+            <div className="flex justify-between items-end text-sm">
+                <div className="font-bold text-slate-900 dark:text-white">
+                    {p1}
+                </div>
+                <div className="text-xs uppercase tracking-widest font-semibold text-slate-400 dark:text-slate-500 mb-0.5">{label}</div>
+                <div className="font-bold text-slate-900 dark:text-white">
+                    {p2}
+                </div>
+            </div>
+            <div className="h-2 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden flex">
+                <div className="h-full w-1/2 bg-slate-100 dark:bg-slate-800" />
+                <div className="h-full w-0.5 bg-white dark:bg-slate-800" />
+                <div className="h-full w-1/2 bg-slate-100 dark:bg-slate-800" />
             </div>
         </div>
     );

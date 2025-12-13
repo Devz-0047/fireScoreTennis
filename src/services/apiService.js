@@ -18,3 +18,8 @@ export const fetchMatches = async () => {
     const response = await api.get('/api/matches');
     return response.data;
 };
+
+export const fetchMatch = async (id) => {
+    const response = await api.get(`/api/matches/${id}`);
+    return response.data;
+};
