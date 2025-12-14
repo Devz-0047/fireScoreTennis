@@ -10,7 +10,7 @@ export default function LandingPage() {
         <div className="min-h-screen flex flex-col">
 
             {/* Hero Section */}
-            <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
+            <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
                 {/* Video Background */}
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-slate-50 dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900 z-10" />
@@ -32,7 +32,7 @@ export default function LandingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }}
                     >
-                        <span className="inline-block px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-400 text-sm md:text-base font-medium tracking-widest dark:text-blue-300 uppercase mb-6 backdrop-blur-md shadow-lg mt-4 lg:mt-36">
+                        <span className="inline-block px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-400 text-sm md:text-base font-medium tracking-widest dark:text-blue-300 uppercase mb-2 backdrop-blur-md shadow-lg mt-4 lg:mt-28">
                             Live Tennis Intelligence
                         </span>
                         <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-6 drop-shadow-2xl">
@@ -46,7 +46,7 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-                        className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md"
+                        className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 mb-6 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md"
                     >
                         The most advanced real-time tracking system for professional tennis.
                         Live scores, deep analytics, and global rankings in one stunning interface.
@@ -83,7 +83,7 @@ export default function LandingPage() {
             </section>
 
             {/* Feature Section 1: Immersive Analytics */}
-            <Section className="bg-slate-50 dark:bg-slate-900 py-32">
+            <Section className="bg-slate-50 dark:bg-slate-900 py-28">
                 <div className="container mx-auto px-6">
                     <div className="grid md:grid-cols-2 gap-16 items-center">
                         <motion.div
