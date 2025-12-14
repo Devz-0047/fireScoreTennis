@@ -56,7 +56,6 @@ export default function LiveMatchDetails() {
         socketRef.current.emit("joinMatch", matchId);
 
         socketRef.current.on("scoreUpdated", (updatedScore) => {
-            console.log("live score", updatedScore);
             setMatch(prev => ({
                 ...prev,
                 score: updatedScore
