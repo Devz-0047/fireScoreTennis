@@ -62,8 +62,8 @@ export default function LandingPage() {
                             onClick={() => navigate('/score')}
                             className="group relative px-10 py-5 bg-slate-900 text-white dark:bg-white dark:text-slate-950 rounded-full font-bold text-xl hover:bg-blue-600 dark:hover:bg-blue-50 transition-all transform hover:scale-105 shadow-xl dark:shadow-[0_0_50px_-10px_rgba(255,255,255,0.4)]"
                         >
-                            <span className="flex items-center mt-[-20]">
-                                Live Scores <ArrowRight className="mt-[-8] ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                            <span className="flex items-center">
+                                Live Scores <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
                             </span>
                         </button>
                     </motion.div>

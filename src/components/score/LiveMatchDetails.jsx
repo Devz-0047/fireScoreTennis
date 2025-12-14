@@ -8,12 +8,14 @@ import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { getCountryCode } from '../../utils/countryMapper';
 import MatchDetailsSkeleton from '../skeletons/MatchDetailsSkeleton';
+import WinnerOverlay from './WinnerOverlay';
 
 const POINT_MAP = [0, 15, 30, 40];
 
 export default function LiveMatchDetails() {
     const navigate = useNavigate();
     const [match, setMatch] = useState(null);
+    const [showWinnerOverlay, setShowWinnerOverlay] = useState(true);
     const socketRef = useRef(null);
     // Use initialMatch status or match status
     const { matchId } = useParams();
@@ -55,11 +57,32 @@ export default function LiveMatchDetails() {
         // console.log(`🔌 Connecting to Socket.IO: ${socketUrl}`);
         socketRef.current.emit("joinMatch", matchId);
 
-        socketRef.current.on("scoreUpdated", (updatedScore) => {
-            setMatch(prev => ({
-                ...prev,
-                score: updatedScore
-            }));
+        socketRef.current.on("scoreUpdated", (data) => {
+            console.log("WebSocket update received:", data);
+
+            setMatch(prev => {
+                if (!prev) return prev;
+
+                // Handle case where data might be the full match object, just the score, or have nested stats
+                // Assuming standard "scoreUpdated" sends partial or full score object
+                const incomingScore = data.score || data;
+                const incomingStats = data.statistics;
+
+                return {
+                    ...prev,
+                    // Merge top-level status/winner if present.
+                    // If the socket event is just score, these might be undefined, so fallback to prev.
+                    status: data.status || prev.status,
+                    winner: data.winner || prev.winner,
+
+                    score: {
+                        ...prev.score,
+                        ...incomingScore
+                    },
+                    // Only update statistics if they are present in the update
+                    statistics: incomingStats ? incomingStats : prev.statistics
+                };
+            });
         });
 
         return () => {
@@ -70,6 +93,14 @@ export default function LiveMatchDetails() {
     if (!match) return <MatchDetailsSkeleton />;
 
     const { playerA, playerB, statistics, matchInfo, status } = match;
+
+    // Determine Winner Object for Overlay
+    let winnerObject = null;
+    if (status === 'completed' || status === 'finished') {
+        // Simple check based on winner field or known logic
+        if (match.winner === 'playerA' || match.winner?._id === playerA._id) winnerObject = playerA;
+        else if (match.winner === 'playerB' || match.winner?._id === playerB._id) winnerObject = playerB;
+    }
 
     // Map API stats to component format
     const stats = statistics || {
@@ -103,13 +134,19 @@ export default function LiveMatchDetails() {
 
                 {/* Scoreboard Container */}
                 <div className="flex flex-col items-center bg-slate-100 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800 w-full max-w-sm">
-                    {/* Live Indicator */}
+                    {/* Live Indicator or Final */}
                     <div className="flex items-center space-x-2 mb-3">
-                        <span className="relative flex h-2.5 w-2.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                        </span>
-                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Live Score</span>
+                        {status === 'completed' || status === 'finished' ? (
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Final Score</span>
+                        ) : (
+                            <>
+                                <span className="relative flex h-2.5 w-2.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                </span>
+                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Live Score</span>
+                            </>
+                        )}
                     </div>
 
                     {/* Sets Display */}
@@ -184,6 +221,11 @@ export default function LiveMatchDetails() {
                 Back to Scores
             </button>
 
+            {/* Winner Overlay */}
+            {(status === 'completed' || status === 'finished') && showWinnerOverlay && winnerObject && (
+                <WinnerOverlay winner={winnerObject} onClose={() => setShowWinnerOverlay(false)} />
+            )}
+
             {/* Scoreboard Header */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700/50">
                 {/* Match Info Bar */}
@@ -214,28 +256,8 @@ export default function LiveMatchDetails() {
                 </div>
             </div>
 
-            {/* Statistics / Comparison Grid */}
-            <div className="grid md:grid-cols-3 gap-6">
-                {/* Momentum / Key Stats */}
-                <div className="md:col-span-2 space-y-6">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center">
-                            <Activity className="w-5 h-5 mr-2 text-blue-500" />
-                            Match Statistics
-                        </h3>
-
-                        <div className="space-y-6">
-                            <StatBar label="Aces" p1={stats.aces.playerA} p2={stats.aces.playerB} icon={<Zap size={14} />} />
-                            <StatBar label="Double Faults" p1={stats.doubleFaults.playerA} p2={stats.doubleFaults.playerB} reverse />
-                            <StatBar label="1st Serve %" p1={stats.firstServePercentage.playerA} p2={stats.firstServePercentage.playerB} suffix="%" />
-                            <StatBar label="Win % on 1st Serve" p1={stats.winOnFirstServe.playerA} p2={stats.winOnFirstServe.playerB} suffix="%" />
-                            <StatBar label="Winners" p1={stats.winners.playerA} p2={stats.winners.playerB} icon={<Target size={14} />} />
-                            <StatBar label="Unforced Errors" p1={stats.unforcedErrors.playerA} p2={stats.unforcedErrors.playerB} reverse />
-                            <StatBar label="Break Points Saved" p1={stats.breakPointsSaved.playerA} p2={stats.breakPointsSaved.playerB} icon={<Shield size={14} />} />
-                        </div>
-                    </div>
-                </div>
-
+            {/* Statistics / Comparison Grid - SIMPLIFIED: Removed Stats, kept Info */}
+            <div className="w-full">
                 {/* Additional Info */}
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700/50">
@@ -292,8 +314,8 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
             </div>
             <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">
-                    <FlagIcon code={getCountryCode(player.counrty_code)} className="w-4 h-3" />
-                    <span>{player.counrty_code}</span>
+                    <FlagIcon code={getCountryCode(player.country_code)} className="w-4 h-3" />
+                    <span>{player.country_code}</span>
                 </div>
                 <h2 className={clsx(
                     "text-xl md:text-2xl font-bold leading-tight",

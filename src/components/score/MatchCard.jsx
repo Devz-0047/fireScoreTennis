@@ -14,6 +14,18 @@ export default function MatchCard({ match }) {
     const p1Id = playerA?._id;
     const p2Id = playerB?._id;
 
+    // Winner check
+    const checkWinner = (playerId, side) => {
+        if (!isFinished || !match.winner) return false;
+        if (match.winner === side) return true;
+        if (match.winner === playerId) return true;
+        if (match.winner?._id === playerId) return true;
+        return false;
+    };
+
+    const isP1Winner = checkWinner(p1Id, 'playerA');
+    const isP2Winner = checkWinner(p2Id, 'playerB');
+
     return (
         <Link
             to={`/score/${matchId}`}
@@ -26,13 +38,24 @@ export default function MatchCard({ match }) {
                         <FlagIcon code={getCountryCode(playerA?.country_code)} />
                         {p1Id ? (
                             <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
-                                <Link to={`/rankings/${p1Id}`} className="text-slate-900 dark:text-white font-bold">
+                                <Link to={`/rankings/${p1Id}`} className={clsx(
+                                    "font-bold",
+                                    isP1Winner ? "text-green-600 dark:text-green-400" : "text-slate-900 dark:text-white"
+                                )}>
                                     {playerA?.name}
                                 </Link>
                             </div>
                         ) : (
-                            <span className="font-medium text-slate-900 dark:text-white font-bold">
+                            <span className={clsx(
+                                "font-medium font-bold",
+                                isP1Winner ? "text-green-600 dark:text-green-400" : "text-slate-900 dark:text-white"
+                            )}>
                                 {playerA?.name}
+                            </span>
+                        )}
+                        {isP1Winner && (
+                            <span className="text-[10px] font-bold text-white bg-green-500 px-1.5 py-0.5 rounded ml-2 shadow-sm">
+                                W
                             </span>
                         )}
                     </div>
@@ -44,18 +67,30 @@ export default function MatchCard({ match }) {
                         <FlagIcon code={getCountryCode(playerB?.country_code)} />
                         {p2Id ? (
                             <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
-                                <Link to={`/rankings/${p2Id}`} className="text-slate-900 dark:text-white font-bold">
+                                <Link to={`/rankings/${p2Id}`} className={clsx(
+                                    "font-bold",
+                                    isP2Winner ? "text-green-600 dark:text-green-400" : "text-slate-900 dark:text-white"
+                                )}>
                                     {playerB?.name}
                                 </Link>
                             </div>
                         ) : (
-                            <span className="font-medium text-slate-900 dark:text-white font-bold">
+                            <span className={clsx(
+                                "font-medium font-bold",
+                                isP2Winner ? "text-green-600 dark:text-green-400" : "text-slate-900 dark:text-white"
+                            )}>
                                 {playerB?.name}
+                            </span>
+                        )}
+                        {isP2Winner && (
+                            <span className="text-[10px] font-bold text-white bg-green-500 px-1.5 py-0.5 rounded ml-2 shadow-sm">
+                                W
                             </span>
                         )}
                     </div>
                 </div>
             </div>
+
 
             {isUpcoming && (
                 <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 md:flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
