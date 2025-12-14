@@ -84,11 +84,12 @@ export default function LiveMatchDetails() {
     };
 
     // Extract Score Info (Adapting to potential data structure variants)
-    const sets = match.sets || [];
-    const points = match.points || null;
+    const sets = match.score?.sets || [];
+    const setScore = match.score?.setScore || { playerA: 0, playerB: 0 };
+
     // Normalize current score: try playerA/B, fallback to p1/p2, fallback to 0
-    const scoreA = match.currentScore?.playerA || match.currentScore?.p1 || '0';
-    const scoreB = match.currentScore?.playerB || match.currentScore?.p2 || '0';
+    // const scoreA = match.currentScore?.playerA || match.currentScore?.p1 || '0';
+    // const scoreB = match.currentScore?.playerB || match.currentScore?.p2 || '0';
 
     const displayPoint = (side) => {
         if (match.score?.advantage === side) return "AD";
@@ -113,46 +114,56 @@ export default function LiveMatchDetails() {
                     </div>
 
                     {/* Sets Display */}
-                    <div className="flex w-full justify-between items-center mb-4 text-sm font-mono text-slate-400 dark:text-slate-500 border-b border-slate-200 dark:border-slate-700/50 pb-2">
-                        <span>Sets</span>
-                        <div className="flex space-x-6">
-                            {sets.map((set, index) => (
-                                <div key={index} className="flex flex-col items-center space-y-1">
-                                    <span className="text-xs uppercase">Set {index + 1}</span>
-                                    <div className="flex space-x-2 text-slate-800 dark:text-slate-200 font-bold">
-                                        <span>{set.playerA || set.p1 || 0}</span>
-                                        <span className="text-slate-400">-</span>
-                                        <span>{set.playerB || set.p2 || 0}</span>
+                    <div className="w-full mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700/50">
+                        <div className="flex justify-between items-center">
+
+                            <div className="flex space-x-2 md:space-x-4">
+                                {sets.map((set, index) => (
+                                    <div key={index} className="flex flex-col items-center bg-white dark:bg-slate-700/50 px-3 py-1.5 rounded-md border border-slate-100 dark:border-slate-600 shadow-sm">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Set {index + 1}</span>
+                                        <div className="flex items-center space-x-2 text-sm font-bold text-slate-900 dark:text-white font-mono">
+                                            <span>{set.games?.playerA ?? 0}</span>
+                                            <span className="text-slate-300 dark:text-slate-600">-</span>
+                                            <span>{set.games?.playerB ?? 0}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                            {sets.length === 0 && <span className="text-xs">Match Starting...</span>}
+                                ))}
+                                {sets.length === 0 && <span className="text-xs text-slate-400">Match Starting...</span>}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Points / Current Game */}
-                    <div className="flex items-center justify-between w-full">
-                        {/* Player A Points */}
+                    {/* Main Score (Set Score) */}
+                    <div className="flex items-center justify-between w-full mb-4">
                         <div className="flex flex-col items-center">
                             <span className="text-4xl md:text-5xl font-mono font-bold text-slate-900 dark:text-white">
-                                {displayPoint("playerA")}
+                                {setScore.playerA ?? 0}
                             </span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sets</span>
                         </div>
 
                         <div className="px-4 text-slate-300 dark:text-slate-600 font-light text-2xl">
                             -
                         </div>
 
-                        {/* Player B Points */}
                         <div className="flex flex-col items-center">
                             <span className="text-4xl md:text-5xl font-mono font-bold text-slate-900 dark:text-white">
-                                {displayPoint("playerB")}
+                                {setScore.playerB ?? 0}
                             </span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sets</span>
                         </div>
                     </div>
 
-                    <div className="mt-2 text-xs font-medium text-slate-400 uppercase tracking-wider">
-                        Current Game
+                    {/* Current Game Points */}
+                    <div className="w-full bg-blue-50 dark:bg-blue-900/10 rounded-lg p-3 border border-blue-100 dark:border-blue-900/30">
+                        <div className="flex justify-center items-center mb-1">
+                            <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 text-center">Current Game</div>
+                        </div>
+                        <div className="flex justify-between items-center text-xl font-bold font-mono text-slate-900 dark:text-white">
+                            <span>{displayPoint("playerA")}</span>
+                            <span className="text-slate-300 dark:text-slate-600 font-light text-base">-</span>
+                            <span>{displayPoint("playerB")}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -191,7 +202,7 @@ export default function LiveMatchDetails() {
                 <div className="p-8">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 relative">
                         {/* Player 1 */}
-                        <PlayerDisplay player={playerA} isWinner={false} isServer={false} />
+                        <PlayerDisplay player={playerA} isWinner={false} isServer={match.score?.server === 'playerA'} />
 
                         {/* Vs / Score / Time */}
                         <div className="flex flex-col items-center z-10 w-full md:w-auto">
@@ -199,7 +210,7 @@ export default function LiveMatchDetails() {
                         </div>
 
                         {/* Player 2 */}
-                        <PlayerDisplay player={playerB} isWinner={false} isServer={false} />
+                        <PlayerDisplay player={playerB} isWinner={false} isServer={match.score?.server === 'playerB'} />
                     </div>
                 </div>
             </div>
@@ -252,11 +263,15 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
     if (!player) return null;
 
     return (
-        <div className={clsx("flex flex-col items-center space-y-4 flex-1", alignRight && "md:flex-col-reverse")}>
+        <div className={clsx(
+            "flex flex-col items-center space-y-4 flex-1 p-4 rounded-xl transition-colors",
+            alignRight && "md:flex-col-reverse",
+            isServer && "bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30"
+        )}>
             <div className="relative">
                 <div className={clsx(
                     "w-24 h-24 rounded-full p-1 border-2",
-                    isWinner ? "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)]" : "border-slate-200 dark:border-slate-700"
+                    isServer ? "border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.4)]" : "border-slate-200 dark:border-slate-700"
                 )}>
                     <img
                         src={`https://i.pravatar.cc/300?u=${player._id}`}
@@ -264,9 +279,15 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
                         className="w-full h-full rounded-full object-cover"
                     />
                 </div>
-                {isServer && (
+                {/* {isServer && (
                     <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-slate-900 p-1.5 rounded-full shadow-lg border-2 border-slate-900">
                         <Zap size={12} fill="currentColor" />
+                    </div>
+                )} */}
+                {isServer && (
+                    <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg uppercase tracking-wider border-2 border-white dark:border-slate-900 flex items-center gap-1">
+                        <Zap size={10} fill="currentColor" />
+                        Serving
                     </div>
                 )}
             </div>
@@ -275,7 +296,10 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
                     <FlagIcon code={getCountryCode(player.counrty_code)} className="w-4 h-3" />
                     <span>{player.counrty_code}</span>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                <h2 className={clsx(
+                    "text-xl md:text-2xl font-bold leading-tight",
+                    isServer ? "text-slate-900 dark:text-white" : "text-slate-900 dark:text-white"
+                )}>
                     {player.name}
                 </h2>
                 <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Rank #{player.ranking}</div>

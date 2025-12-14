@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMatch } from '../services/apiService';
 import FlagIcon from '../components/ui/FlagIcon';
@@ -9,6 +9,8 @@ import { useTheme } from '../context/ThemeContext';
 import { getCountryCode } from '../utils/countryMapper';
 import MatchDetailsSkeleton from '../components/skeletons/MatchDetailsSkeleton';
 import LiveMatchDetails from '../components/score/LiveMatchDetails';
+
+const POINT_MAP = [0, 15, 30, 40];
 
 export default function MatchDetailsPage() {
     const { matchId } = useParams();
@@ -60,6 +62,14 @@ export default function MatchDetailsPage() {
 
     const isUpcoming = status === 'upcoming' || status === 'scheduled';
 
+    const checkWinner = (playerId, side) => {
+        if (!match.winner) return false;
+        if (match.winner === side) return true;
+        if (match.winner === playerId) return true;
+        if (match.winner?._id === playerId) return true;
+        return false;
+    };
+
     const renderHeaderContent = () => {
         if (isUpcoming) {
             return (
@@ -77,6 +87,67 @@ export default function MatchDetailsPage() {
                 </div>
             )
         }
+
+        if (status === 'completed' || status === 'finished') {
+            // Extract Score Info (Safe access)
+            const sets = match.score?.sets || [];
+
+            const displayPoint = (side) => {
+                // For completed matches, we might just show final sets, but if user wants points:
+                if (match.score?.advantage === side) return "AD";
+                const p = match.score?.points?.[side] ?? 0;
+                return POINT_MAP[p] ?? "40";
+            };
+
+            return (
+                <div className="flex flex-col items-center bg-slate-100 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800 w-full max-w-sm">
+                    {/* Final Indicator */}
+                    <div className="flex items-center space-x-2 mb-3">
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Final Score</span>
+                    </div>
+
+                    {/* Sets Display */}
+                    {/* Sets Display */}
+                    <div className="w-full mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700/50">
+                        <div className="flex justify-between items-center">
+                            {/* <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Sets Summary</span> */}
+                            <div className="flex space-x-2 md:space-x-4">
+                                {sets.map((set, index) => (
+                                    <div key={index} className="flex flex-col items-center bg-white dark:bg-slate-700/50 px-3 py-1.5 rounded-md border border-slate-100 dark:border-slate-600 shadow-sm">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Set {index + 1}</span>
+                                        <div className="flex items-center space-x-2 text-sm font-bold text-slate-900 dark:text-white font-mono">
+                                            <span>{set.games?.playerA ?? 0}</span>
+                                            <span className="text-slate-300 dark:text-slate-600">-</span>
+                                            <span>{set.games?.playerB ?? 0}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Set Score Display (Big Numbers) */}
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex flex-col items-center">
+                            <span className="text-4xl md:text-5xl font-mono font-bold text-slate-900 dark:text-white">
+                                {match.score?.setScore?.playerA ?? 0}
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sets</span>
+                        </div>
+                        <div className="px-4 text-slate-300 dark:text-slate-600 font-light text-2xl">
+                            -
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-4xl md:text-5xl font-mono font-bold text-slate-900 dark:text-white">
+                                {match.score?.setScore?.playerB ?? 0}
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sets</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="text-center">
                 <div className="text-4xl font-bold text-slate-300 dark:text-slate-600 mb-2">VS</div>
@@ -119,7 +190,7 @@ export default function MatchDetailsPage() {
                 <div className="p-8">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 relative">
                         {/* Player 1 */}
-                        <PlayerDisplay player={playerA} isWinner={false} isServer={false} />
+                        <PlayerDisplay player={playerA} isWinner={checkWinner(playerA._id, 'playerA')} isServer={false} />
 
                         {/* Vs / Score / Time */}
                         <div className="flex flex-col items-center z-10 w-full md:w-auto">
@@ -127,7 +198,7 @@ export default function MatchDetailsPage() {
                         </div>
 
                         {/* Player 2 */}
-                        <PlayerDisplay player={playerB} isWinner={false} isServer={false} />
+                        <PlayerDisplay player={playerB} isWinner={checkWinner(playerB._id, 'playerB')} isServer={false} />
                     </div>
                 </div>
             </div>
@@ -188,11 +259,18 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
     if (!player) return null;
 
     return (
-        <div className={clsx("flex flex-col items-center space-y-4 flex-1", alignRight && "md:flex-col-reverse")}>
+        <Link
+            to={`/rankings/${player._id}`}
+            className={clsx(
+                "flex flex-col items-center space-y-4 flex-1 p-4 rounded-xl transition-all duration-300 hover:scale-105 hover:bg-slate-50 dark:hover:bg-slate-800/80 cursor-pointer group",
+                alignRight && "md:flex-col-reverse",
+                isWinner && "bg-green-50/50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30"
+            )}
+        >
             <div className="relative">
                 <div className={clsx(
                     "w-24 h-24 rounded-full p-1 border-2",
-                    isWinner ? "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)]" : "border-slate-200 dark:border-slate-700"
+                    isWinner ? "border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.4)]" : "border-slate-200 dark:border-slate-700"
                 )}>
                     <img
                         src={`https://i.pravatar.cc/300?u=${player._id}`} // Use API ID for consistent avatars
@@ -205,18 +283,26 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
                         <Zap size={12} fill="currentColor" />
                     </div>
                 )}
+                {isWinner && (
+                    <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg uppercase tracking-wider border-2 border-white dark:border-slate-900">
+                        Winner
+                    </div>
+                )}
             </div>
             <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">
                     <FlagIcon code={getCountryCode(player.country_code)} className="w-4 h-3" />
                     <span>{player.country_code}</span> {/* API uses 'country_code', mapper handles numbers if needed or we show code */}
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                <h2 className={clsx(
+                    "text-xl md:text-2xl font-bold leading-tight",
+                    isWinner ? "text-green-600 dark:text-green-400" : "text-slate-900 dark:text-white"
+                )}>
                     {player.name}
                 </h2>
                 <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Rank #{player.ranking}</div>
             </div>
-        </div>
+        </Link>
     );
 }
 
