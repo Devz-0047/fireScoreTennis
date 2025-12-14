@@ -34,23 +34,23 @@ export default function AboutPage() {
 
             {/* Grid */}
             <div className="grid md:grid-cols-2 gap-8">
-                <motion.div variants={item} className="bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-700/50">
+                <motion.div variants={item} className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700/50">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-6">
                         <Activity className="w-6 h-6 text-blue-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-4">Purpose</h2>
-                    <p className="text-slate-400 leading-relaxed">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Purpose</h2>
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
                         FireScore provides a real-time, immersive way to follow tennis matches.
                         Designed to replace clunky, legacy scoreboards with a modern, animated interface that brings the energy of the court to your screen.
                     </p>
                 </motion.div>
 
-                <motion.div variants={item} className="bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-700/50">
+                <motion.div variants={item} className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700/50">
                     <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-6">
                         <Users className="w-6 h-6 text-purple-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white mb-4">Target Users</h2>
-                    <ul className="space-y-3 text-slate-400">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Target Users</h2>
+                    <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                         <li className="flex items-center space-x-2">
                             <span className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
                             <span>Tennis Enthusiasts tracking live games</span>
@@ -67,10 +67,10 @@ export default function AboutPage() {
                 </motion.div>
             </div>
 
-            <motion.div variants={item} className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700/50">
+            <motion.div variants={item} className="bg-white dark:bg-slate-800/50 p-8 rounded-2xl border border-slate-200 dark:border-slate-700/50">
                 <div className="flex items-center space-x-4 mb-8">
                     <Zap className="w-8 h-8 text-yellow-400 fill-current" />
-                    <h2 className="text-3xl font-bold text-white">Key Features</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Key Features</h2>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">
@@ -96,8 +96,8 @@ export default function AboutPage() {
 function FeatureCard({ title, desc }) {
     return (
         <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-white">{title}</h3>
-            <p className="text-sm text-slate-400">{desc}</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{desc}</p>
         </div>
     )
 }

@@ -6,7 +6,13 @@ export function ThemeProvider({ children }) {
     // Default to 'dark' as per user requirement that current styles are dark mode
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
-        return savedTheme || 'dark';
+        if (savedTheme) return savedTheme;
+
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+
+        return 'dark'; // Default fallback
     });
 
     useEffect(() => {

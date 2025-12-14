@@ -32,7 +32,7 @@ export default function LandingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }}
                     >
-                        <span className="inline-block px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-300 text-sm md:text-base font-medium tracking-widest uppercase mb-6 backdrop-blur-md shadow-lg mt-4 lg:mt-36">
+                        <span className="inline-block px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-400 text-sm md:text-base font-medium tracking-widest dark:text-blue-300 uppercase mb-6 backdrop-blur-md shadow-lg mt-4 lg:mt-36">
                             Live Tennis Intelligence
                         </span>
                         <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-6 drop-shadow-2xl">

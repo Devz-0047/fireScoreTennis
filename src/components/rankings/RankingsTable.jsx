@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { ArrowUpDown, AlertCircle, ChevronUp, ChevronDown } from 'lucide-react';
 import { fetchPlayers } from '../../services/apiService';
 import { getCountryCode } from '../../utils/countryMapper';
+import { RankingTableSkeleton } from '../skeletons';
 
 // Variants removed for separate animation performance
 
@@ -60,47 +61,7 @@ export default function RankingsTable() {
     const totalPages = players ? Math.ceil(players.length / itemsPerPage) : 0;
 
     if (isLoading) {
-        return (
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 overflow-hidden">
-                <div className="overflow-x-hidden overflow-y-hidden">
-                    <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700/50">
-                        <thead className="bg-slate-50 dark:bg-slate-900/50">
-                            <tr className='text-xl'>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Rank</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Player</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Wins</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Losses</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Slams</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 bg-white dark:bg-slate-800">
-                            {[...Array(5)].map((_, i) => (
-                                <tr key={i} className="animate-pulse">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-8"></div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="h-3.5 w-5 bg-slate-200 dark:bg-slate-700 rounded mr-3"></div>
-                                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-12"></div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-12"></div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-8"></div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        );
+        return <RankingTableSkeleton />;
     }
 
     if (isError) {
@@ -113,14 +74,14 @@ export default function RankingsTable() {
         );
     }
 
-    const HeaderCell = ({ label, sortKey }) => {
+    const HeaderCell = ({ label, sortKey, className = "w-32" }) => {
         const isActive = sortConfig.key === sortKey;
         return (
             <th
                 className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-slate-700/30 ${isActive
                     ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20'
                     : 'text-slate-500 dark:text-slate-400'
-                    }`}
+                    } ${className}`}
                 onClick={() => handleSort(sortKey)}
             >
                 <div className="flex items-center space-x-1 group">
@@ -149,8 +110,8 @@ export default function RankingsTable() {
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700/50">
                         <thead className="bg-slate-50 dark:bg-slate-900/50">
                             <tr>
-                                <HeaderCell label="Rank" sortKey="ranking" />
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Player</th>
+                                <HeaderCell label="Rank" sortKey="ranking" className="w-24" />
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-full">Player</th>
                                 <HeaderCell label="Wins" sortKey="wins" />
                                 <HeaderCell label="Losses" sortKey="losses" />
                                 <HeaderCell label="Slams" sortKey="grandSlams" />
