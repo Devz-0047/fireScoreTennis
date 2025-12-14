@@ -95,7 +95,7 @@ export default function PlayerProfilePage() {
         >
             <button
                 onClick={() => navigate('/rankings')}
-                className="flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors mb-4"
+                className="flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors mb-4 cursor-pointer"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Rankings
             </button>

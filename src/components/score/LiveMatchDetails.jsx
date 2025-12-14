@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import FlagIcon from '../ui/FlagIcon';
@@ -9,40 +9,42 @@ import { clsx } from 'clsx';
 import { getCountryCode } from '../../utils/countryMapper';
 import MatchDetailsSkeleton from '../skeletons/MatchDetailsSkeleton';
 
-export default function LiveMatchDetails({ match: initialMatch }) {
+const POINT_MAP = [0, 15, 30, 40];
+
+export default function LiveMatchDetails() {
     const navigate = useNavigate();
-    const [match, setMatch] = useState(initialMatch);
+    const [match, setMatch] = useState(null);
     const socketRef = useRef(null);
     // Use initialMatch status or match status
-    const matchId = match?.matchId;
+    const { matchId } = useParams();
 
     // --------------------------
     // Initial Load (ONCE)
     // --------------------------
-    useEffect(() => {
-        if (!matchId) return;
 
-        const loadMatch = async () => {
-            try {
-                const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-                const res = await axios.get(
-                    `${baseUrl}/api/matches/${matchId}`
-                );
-                setMatch(res.data);
-            } catch (err) {
-                console.error("Failed to load match data", err);
-            }
-        };
-        // If we don't have initial data, fetch it. If we do, we might skip or re-fetch to be safe.
-        // User pattern suggests fetching.
-        loadMatch();
-    }, [matchId]);
+
+    const loadMatch = async () => {
+        try {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+            const res = await axios.get(
+                `${baseUrl}/api/matches/${matchId}`
+            );
+            setMatch(res.data);
+        } catch (err) {
+            console.error("Failed to load match data", err);
+        }
+    };
+    // If we don't have initial data, fetch it. If we do, we might skip or re-fetch to be safe.
+    // User pattern suggests fetching.
+
+
 
     // --------------------------
     // Socket Listener (READ ONLY)
     // --------------------------
     useEffect(() => {
-        if (!matchId) return;
+        loadMatch();
+        // if (!matchId) return;
 
         const socketUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -50,28 +52,19 @@ export default function LiveMatchDetails({ match: initialMatch }) {
             transports: ["websocket"]
         });
 
-        console.log(`🔌 Connecting to Socket.IO: ${socketUrl}`);
+        // console.log(`🔌 Connecting to Socket.IO: ${socketUrl}`);
         socketRef.current.emit("joinMatch", matchId);
 
-        socketRef.current.on("scoreUpdated", (score) => {
-            console.log("⚡ Socket Update (Score):", score);
+        socketRef.current.on("scoreUpdated", (updatedScore) => {
+            console.log("live score", updatedScore);
             setMatch(prev => ({
                 ...prev,
-                // Assuming 'score' is relevant part of match or we merge it
-                // If the backend sends { currentScore: '...' } etc
-                ...score
+                score: updatedScore
             }));
         });
 
-        socketRef.current.on("matchUpdated", (updatedData) => {
-            console.log("⚡ Match Update:", updatedData);
-            setMatch(prev => ({ ...prev, ...updatedData }));
-        });
-
         return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
+            socketRef.current.disconnect();
         };
     }, [matchId]);
 
@@ -92,9 +85,16 @@ export default function LiveMatchDetails({ match: initialMatch }) {
 
     // Extract Score Info (Adapting to potential data structure variants)
     const sets = match.sets || [];
+    const points = match.points || null;
     // Normalize current score: try playerA/B, fallback to p1/p2, fallback to 0
     const scoreA = match.currentScore?.playerA || match.currentScore?.p1 || '0';
     const scoreB = match.currentScore?.playerB || match.currentScore?.p2 || '0';
+
+    const displayPoint = (side) => {
+        if (match.score?.advantage === side) return "AD";
+        const p = match.score?.points?.[side] ?? 0;
+        return POINT_MAP[p] ?? "40";
+    };
 
     const renderHeaderContent = () => {
         return (
@@ -135,7 +135,7 @@ export default function LiveMatchDetails({ match: initialMatch }) {
                         {/* Player A Points */}
                         <div className="flex flex-col items-center">
                             <span className="text-4xl md:text-5xl font-mono font-bold text-slate-900 dark:text-white">
-                                {scoreA}
+                                {displayPoint("playerA")}
                             </span>
                         </div>
 
@@ -146,7 +146,7 @@ export default function LiveMatchDetails({ match: initialMatch }) {
                         {/* Player B Points */}
                         <div className="flex flex-col items-center">
                             <span className="text-4xl md:text-5xl font-mono font-bold text-slate-900 dark:text-white">
-                                {scoreB}
+                                {displayPoint("playerB")}
                             </span>
                         </div>
                     </div>
