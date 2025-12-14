@@ -23,7 +23,7 @@ export default function MatchCard({ match }) {
                 {/* Player 1 */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <FlagIcon code={getCountryCode(playerA?.counrty_code)} />
+                        <FlagIcon code={getCountryCode(playerA?.country_code)} />
                         {p1Id ? (
                             <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
                                 <Link to={`/rankings/${p1Id}`} className="text-slate-900 dark:text-white font-bold">
@@ -41,7 +41,7 @@ export default function MatchCard({ match }) {
                 {/* Player 2 */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <FlagIcon code={getCountryCode(playerB?.counrty_code)} />
+                        <FlagIcon code={getCountryCode(playerB?.country_code)} />
                         {p2Id ? (
                             <div className="font-medium hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors z-10" onClick={(e) => { e.stopPropagation(); }}>
                                 <Link to={`/rankings/${p2Id}`} className="text-slate-900 dark:text-white font-bold">

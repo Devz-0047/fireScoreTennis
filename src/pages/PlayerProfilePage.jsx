@@ -77,7 +77,7 @@ export default function PlayerProfilePage() {
             <div className="text-center py-20">
                 <h2 className="text-xl text-slate-500 dark:text-slate-400">Player not found</h2>
                 <p className="text-sm text-red-400 mt-2">{error?.message}</p>
-                <button onClick={() => navigate('/rankings')} className="mt-4 text-blue-500 dark:text-blue-400 hover:underline">Back to Rankings</button>
+                <button onClick={() => navigate('/rankings')} className="mt-4 text-blue-500 dark:text-blue-400 hover:underline cursor-pointer">Back to Rankings</button>
             </div>
         )
     }
@@ -130,8 +130,8 @@ export default function PlayerProfilePage() {
                             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{player.name}</h1>
                             <div className="flex items-center justify-center md:justify-start space-x-4 text-slate-500 dark:text-slate-400">
                                 <div className="flex items-center space-x-2">
-                                    <FlagIcon code={getCountryCode(player.counrty_code)} />
-                                    <span>{getCountryCode(player.counrty_code).toUpperCase()}</span>
+                                    <FlagIcon code={getCountryCode(player.country_code)} />
+                                    <span>{getCountryCode(player.country_code).toUpperCase()}</span>
                                 </div>
                                 <span>•</span>
                                 <span>{player.age} years old</span>

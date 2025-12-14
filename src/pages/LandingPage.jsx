@@ -179,7 +179,7 @@ export default function LandingPage() {
                                 whileInView={{ scale: 1, opacity: 1 }}
                                 transition={{ delay: i * 0.05 }}
                                 whileHover={{ scale: 1.1, translateY: -5 }}
-                                className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500/50 transition-all cursor-pointer shadow-sm dark:shadow-none"
+                                className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500/50 transition-all shadow-sm dark:shadow-none"
                             >
                                 <img
                                     src={`https://flagcdn.com/${code.toLowerCase()}.svg`}

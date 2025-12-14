@@ -36,7 +36,7 @@ export default function Footer() {
                     <div>
                         <h3 className="text-slate-900 dark:text-white font-bold mb-4 uppercase tracking-wider text-sm">Resources</h3>
                         <ul className="space-y-2">
-                            <FooterLink to="https://fire-score-docs-cqsb.vercel.app/" label="API Documentation" />
+                            <FooterLink to="https://fire-score-docs-cqsb.vercel.app/" label="Documentation" />
                             <FooterLink to="#" label="Terms of Service" />
                             <FooterLink to="#" label="Privacy Policy" />
                             <FooterLink to="#" label="Contact Support" />

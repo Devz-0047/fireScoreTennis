@@ -208,8 +208,8 @@ function PlayerDisplay({ player, isWinner, isServer, alignRight }) {
             </div>
             <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">
-                    <FlagIcon code={getCountryCode(player.counrty_code)} className="w-4 h-3" />
-                    <span>{player.counrty_code}</span> {/* API uses 'counrty_code', mapper handles numbers if needed or we show code */}
+                    <FlagIcon code={getCountryCode(player.country_code)} className="w-4 h-3" />
+                    <span>{player.country_code}</span> {/* API uses 'country_code', mapper handles numbers if needed or we show code */}
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                     {player.name}
