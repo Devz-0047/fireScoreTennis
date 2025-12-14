@@ -151,7 +151,7 @@ export default function LiveMatchDetails() {
 
                     {/* Sets Display */}
                     <div className="w-full mb-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700/50">
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-center items-center">
 
                             <div className="flex space-x-2 md:space-x-4">
                                 {sets.map((set, index) => (
